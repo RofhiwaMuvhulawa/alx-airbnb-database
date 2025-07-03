@@ -129,5 +129,78 @@ Expected Results
 Non-correlated Subquery: Returns 0 or more rows, depending on whether any properties have an average rating greater than 4.0. For each qualifying property, it shows property_id, name, location, and pricepernight.
 Correlated Subquery: Returns 0 rows with the sample data (no user has > 3 bookings). With additional data, it would list users with user_id, first_name, last_name, and email for those with more than 3 bookings.
 
+Airbnb Database Aggregation and Window Functions Queries
+Overview
+This project contains SQL queries demonstrating the use of aggregation and window functions for the Airbnb-like application database, as part of the ALX Airbnb Database Module. The queries are defined in the airbnb_aggregation_window.sql file (artifact_id: ba881f53-1109-4311-91b7-4cb14960f62f) and operate on the database schema created by airbnb_schema.sql (artifact_id: 03de4876-c8f0-4208-9234-58308c841e3e) and populated with sample data from airbnb_seed.sql (artifact_id: 2d289b70-fba7-4728-9e8b-8ff37e4d6e2d).
+The queries showcase advanced SQL techniques to analyze data from the User, Booking, and Property tables, focusing on aggregation with COUNT and GROUP BY, and window functions with ROW_NUMBER and RANK.
+Files
+
+airbnb_aggregation_window.sql: Contains two SQL queries:
+An aggregation query using COUNT and GROUP BY to find the total number of bookings per user.
+A window function query using ROW_NUMBER and RANK to rank properties based on their total number of bookings.
+
+
+
+Queries Overview
+1. Aggregation Query (COUNT and GROUP BY)
+
+Purpose: Retrieves the total number of bookings made by each user.
+Tables Involved: User and Booking.
+Details: Uses a LEFT JOIN to include all users, even those with zero bookings, and groups by user_id, first_name, last_name, and email to compute the booking count using COUNT(b.booking_id). The result shows user details and their booking counts.
+Output: Returns user_id, first_name, last_name, email, and booking_count for all users. With the sample data (5 users, 6 bookings), it shows:
+Jane Smith: 3 bookings
+Bob Johnson: 3 bookings
+John Doe, Alice Brown, Admin User: 0 bookings each
+
+
+Sample Result: 5 rows, one for each user, ordered by booking count (descending) and user_id.
+
+2. Window Function Query (ROW_NUMBER and RANK)
+
+Purpose: Ranks properties based on the total number of bookings they have received.
+Tables Involved: Property and Booking.
+Details: Uses a LEFT JOIN to include all properties, even those with zero bookings, and groups by property_id, name, location, and pricepernight to compute booking counts. ROW_NUMBER assigns unique ranks, and RANK assigns the same rank to properties with equal booking counts, both ordered by booking count (descending).
+Output: Returns property_id, name, location, pricepernight, booking_count, row_number, and rank. With the sample data (4 properties, 6 bookings), it shows:
+Cozy Downtown Loft: 2 bookings, row_number=1, rank=1
+Urban Studio: 2 bookings, row_number=2, rank=1
+Beachfront Cottage: 1 booking, row_number=3, rank=3
+Mountain Cabin: 1 booking, row_number=4, rank=3
+
+
+Sample Result: 4 rows, one for each property, ordered by booking count (descending) and property_id.
+
+Usage
+
+Prerequisites:
+
+The database schema must be created using airbnb_schema.sql.
+The database must be populated with sample data using airbnb_seed.sql.
+A relational database management system (e.g., MySQL, PostgreSQL) that supports UUIDs, ENUMs, and standard SQL syntax, including window functions.
+Database user with permissions to query tables.
+
+
+Setup:
+
+Execute the airbnb_aggregation_window.sql file after setting up the schema and seed data:mysql -u <username> -p <database_name> < airbnb_aggregation_window.sql
+
+or, for PostgreSQL:psql -U <username> -d <database_name> -f airbnb_aggregation_window.sql
+
+
+
+
+Notes:
+
+UUIDs: The schema uses UUIDs for primary keys, which may require enabling the uuid-ossp extension in PostgreSQL (CREATE EXTENSION IF NOT EXISTS "uuid-ossp";).
+ENUMs: The role (User) and status (Booking) fields use ENUMs, which are MySQL-specific. For PostgreSQL, ensure the schema uses custom types or VARCHAR with check constraints.
+Performance: Both queries leverage indexes on user_id, booking_id, and property_id for efficiency. The window function query may have higher computational cost for large datasets due to sorting for ROW_NUMBER and RANK.
+Sample Data Context: The queries assume the sample data from airbnb_seed.sql (5 users, 4 properties, 6 bookings). Results will vary with different data, but the queries are designed to handle any valid dataset.
+
+
+
+Expected Results
+
+Aggregation Query: Returns 5 rows, showing booking counts for all users (e.g., Jane Smith and Bob Johnson with 3 bookings each, others with 0).
+Window Function Query: Returns 4 rows, ranking properties by booking count (e.g., Cozy Downtown Loft and Urban Studio tied at rank 1 with 2 bookings each).
+
 License
 This project is for educational purposes as part of the ALX Airbnb Database Module.
